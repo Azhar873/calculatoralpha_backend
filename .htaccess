@@ -1,0 +1,8 @@
+RewriteEngine On
+
+# Allow direct access to files if they exist
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Route everything else to index.php
+RewriteRule ^ index.php [L]
