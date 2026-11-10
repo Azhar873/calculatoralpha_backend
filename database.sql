@@ -94,6 +94,7 @@ CREATE TABLE IF NOT EXISTS pages (
     description TEXT,
     meta_title TEXT,
     meta_description TEXT,
+    meta_keywords TEXT,
     show_in_header TINYINT(1) NOT NULL DEFAULT 0,
     footer_text TEXT,
     footer_section VARCHAR(50) DEFAULT NULL,

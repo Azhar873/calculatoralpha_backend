@@ -9,6 +9,7 @@ $page_endpoint = $parts[1] ?? '';
 
 function ensurePagesColumns($pdo) {
     $columns = [
+        'meta_keywords' => 'TEXT DEFAULT NULL',
         'footer_section' => "VARCHAR(50) DEFAULT NULL",
         'show_in_header' => 'TINYINT(1) NOT NULL DEFAULT 0',
         'page_type' => "VARCHAR(50) DEFAULT 'default'",

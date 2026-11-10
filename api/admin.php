@@ -111,6 +111,7 @@ if ($admin_endpoint === 'regenerate-sitemap' && $method === 'POST') {
 
 function ensurePagesContactColumns($pdo) {
     $columns = [
+        'meta_keywords' => 'TEXT DEFAULT NULL',
         'show_in_header' => 'TINYINT(1) NOT NULL DEFAULT 0',
         'page_type' => "VARCHAR(50) DEFAULT 'default'",
         'contact_email' => 'VARCHAR(255) DEFAULT NULL',
@@ -323,7 +324,7 @@ switch ($admin_endpoint) {
         } elseif ($method === 'POST') {
             $input = json_decode(file_get_contents('php://input'), true);
             $stmt = $pdo->prepare(
-                "INSERT INTO pages (title, slug, heading, banner_image, description, meta_title, meta_description, show_in_header, footer_text, footer_section, page_type, contact_email, contact_phone, contact_address, contact_intro, contact_form_title, contact_submit_label) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+                "INSERT INTO pages (title, slug, heading, banner_image, description, meta_title, meta_description, meta_keywords, show_in_header, footer_text, footer_section, page_type, contact_email, contact_phone, contact_address, contact_intro, contact_form_title, contact_submit_label) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
             );
             $stmt->execute([
                 $input['title'] ?? '',
@@ -333,6 +334,7 @@ switch ($admin_endpoint) {
                 $input['description'] ?? '',
                 $input['meta_title'] ?? '',
                 $input['meta_description'] ?? '',
+                $input['meta_keywords'] ?? '',
                 !empty($input['show_in_header']) ? 1 : 0,
                 $input['footer_text'] ?? '',
                 $input['footer_section'] ?? '',
@@ -356,7 +358,7 @@ switch ($admin_endpoint) {
             if (!$existing) sendResponse(['error' => 'Page not found'], 404);
 
             $stmt = $pdo->prepare(
-                "UPDATE pages SET title=?, slug=?, heading=?, banner_image=?, description=?, meta_title=?, meta_description=?, show_in_header=?, footer_text=?, footer_section=?, page_type=?, contact_email=?, contact_phone=?, contact_address=?, contact_intro=?, contact_form_title=?, contact_submit_label=? WHERE id=?"
+                "UPDATE pages SET title=?, slug=?, heading=?, banner_image=?, description=?, meta_title=?, meta_description=?, meta_keywords=?, show_in_header=?, footer_text=?, footer_section=?, page_type=?, contact_email=?, contact_phone=?, contact_address=?, contact_intro=?, contact_form_title=?, contact_submit_label=? WHERE id=?"
             );
             $stmt->execute([
                 $input['title'] ?? $existing['title'],
@@ -366,6 +368,7 @@ switch ($admin_endpoint) {
                 $input['description'] ?? $existing['description'],
                 $input['meta_title'] ?? $existing['meta_title'],
                 $input['meta_description'] ?? $existing['meta_description'],
+                $input['meta_keywords'] ?? $existing['meta_keywords'],
                 array_key_exists('show_in_header', $input)
                     ? (!empty($input['show_in_header']) ? 1 : 0)
                     : $existing['show_in_header'],
