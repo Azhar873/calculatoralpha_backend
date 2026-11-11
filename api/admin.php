@@ -89,7 +89,18 @@ function regenerateSitemapFile($pdo) {
     }
 
     $xml .= "</urlset>\n";
-    $sitemap_path = getenv('SITEMAP_PATH') ?: 'F:/new-website/calculator-website/public/sitemap.xml';
+    $sitemap_path = getenv('SITEMAP_PATH');
+    if ($sitemap_path === false || $sitemap_path === '') {
+        if (PHP_OS_FAMILY === 'Windows') {
+            $sitemap_path = 'F:/new-website/calculator-website/public/sitemap.xml';
+        } else {
+            $document_root = $_SERVER['DOCUMENT_ROOT'] ?? '';
+            if ($document_root === '') {
+                throw new RuntimeException('Set SITEMAP_PATH or configure DOCUMENT_ROOT to write sitemap.xml');
+            }
+            $sitemap_path = rtrim($document_root, "/\\") . DIRECTORY_SEPARATOR . 'sitemap.xml';
+        }
+    }
     if (file_put_contents($sitemap_path, $xml) === false) {
         throw new RuntimeException("Could not write sitemap file: {$sitemap_path}");
     }
