@@ -24,7 +24,12 @@ try {
         'section7' => $stored['section7'] ?? '',
         'section8' => $stored['section8'] ?? '',
         'footerText' => $stored['footerText'] ?? 'Smart calculators and easy math tools for daily life, finance, health and study. Everything you need in one clean, modern hub.',
-        'footerCopyright' => $stored['footerCopyright'] ?? ('© ' . date('Y') . ' Calculatoralpha. All rights reserved.')
+        'footerCopyright' => $stored['footerCopyright'] ?? ('© ' . date('Y') . ' Calculatoralpha. All rights reserved.'),
+        'socialFacebookUrl' => $stored['socialFacebookUrl'] ?? '',
+        'socialInstagramUrl' => $stored['socialInstagramUrl'] ?? '',
+        'socialYouTubeUrl' => $stored['socialYouTubeUrl'] ?? '',
+        'socialXUrl' => $stored['socialXUrl'] ?? '',
+        'socialLinkedInUrl' => $stored['socialLinkedInUrl'] ?? ''
     ];
 
     $jsonValue = json_encode($defaults, JSON_UNESCAPED_UNICODE);

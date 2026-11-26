@@ -24,7 +24,12 @@ if ($method === 'GET') {
         'section8' => '',
         // footer defaults
         'footerText' => '',
-        'footerCopyright' => ''
+        'footerCopyright' => '',
+        'socialFacebookUrl' => '',
+        'socialInstagramUrl' => '',
+        'socialYouTubeUrl' => '',
+        'socialXUrl' => '',
+        'socialLinkedInUrl' => ''
     ];
 
     // Merge stored over defaults so existing values are preserved
