@@ -78,6 +78,18 @@ switch ($endpoint) {
     case 'screenshot-calculator':
         require_once __DIR__ . '/api/screenshot-calculator.php';
         break;
+    case 'question-generator':
+        require_once __DIR__ . '/api/question-generator.php';
+        break;
+    case 'question-generator-example':
+        require_once __DIR__ . '/api/question-generator-example.php';
+        break;
+    case 'ai-translator':
+        require_once __DIR__ . '/api/ai-translator.php';
+        break;
+    case 'ai-chat':
+        require_once __DIR__ . '/api/ai-chat.php';
+        break;
     default:
         sendResponse(['error' => 'Endpoint not found', 'path' => $path], 404);
         break;
