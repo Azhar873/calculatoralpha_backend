@@ -38,6 +38,14 @@ if ($apiMarker !== false) {
 // Database Connection
 require_once __DIR__ . '/config/db.php';
 
+// Keep existing calculator databases compatible with the component mapping.
+if (in_array($endpoint, ['categories', 'calculators', 'admin'], true)) {
+    $componentKeyColumn = $pdo->query("SHOW COLUMNS FROM calculators LIKE 'component_key'")->fetch();
+    if (!$componentKeyColumn) {
+        $pdo->exec("ALTER TABLE calculators ADD COLUMN component_key VARCHAR(120) DEFAULT NULL AFTER slug");
+    }
+}
+
 // Route to appropriate file
 switch ($endpoint) {
     case 'categories':

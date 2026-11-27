@@ -36,6 +36,7 @@ CREATE TABLE IF NOT EXISTS calculators (
     category_id INT NOT NULL,
     name VARCHAR(255) NOT NULL,
     slug VARCHAR(255) NOT NULL UNIQUE,
+    component_key VARCHAR(120) DEFAULT NULL,
     icon VARCHAR(255),
     description TEXT,
     meta JSON, -- Stores formula data, related tools, etc.

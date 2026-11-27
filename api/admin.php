@@ -208,12 +208,20 @@ switch ($admin_endpoint) {
             }
         } elseif ($method === 'POST') {
             $input = json_decode(file_get_contents('php://input'), true);
-                $sitemap_index = !empty($input['sitemap_index']) ? 1 : 0;
-                $sql = "INSERT INTO calculators (category_id, name, slug, icon, description, language, heading, meta_title, meta_description, no_index, mathjax, sitemap_index, sitemap_ever_indexed, is_featured, is_active) 
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            if (!is_array($input)) {
+                sendResponse(['error' => 'Invalid calculator data'], 400);
+            }
+            $component_key = $input['component_key'] ?? null;
+            if (!is_string($component_key) || !preg_match('/^[a-z0-9]+(?:-[a-z0-9]+)*$/', trim($component_key))) {
+                sendResponse(['error' => 'A valid calculator type is required'], 400);
+            }
+            $component_key = trim($component_key);
+            $sitemap_index = !empty($input['sitemap_index']) ? 1 : 0;
+            $sql = "INSERT INTO calculators (category_id, name, slug, component_key, icon, description, language, heading, meta_title, meta_description, no_index, mathjax, sitemap_index, sitemap_ever_indexed, is_featured, is_active) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             $stmt = $pdo->prepare($sql);
             $stmt->execute([
-                $input['category_id'], $input['name'], $input['slug'], $input['icon'] ?? '', $input['description'] ?? '',
+                $input['category_id'], $input['name'], $input['slug'], $component_key, $input['icon'] ?? '', $input['description'] ?? '',
                 $input['language'] ?? 'English', $input['heading'] ?? '', $input['meta_title'] ?? '', $input['meta_description'] ?? '',
                 $input['no_index'] ?? 0, $input['mathjax'] ?? 0, $sitemap_index, $sitemap_index, $input['is_featured'] ?? 0, $input['is_active'] ?? 1
             ]);
@@ -223,6 +231,9 @@ switch ($admin_endpoint) {
             $id = $parts[2] ?? null;
             if (!$id) sendResponse(['error' => 'ID required'], 400);
             $input = json_decode(file_get_contents('php://input'), true);
+            if (!is_array($input)) {
+                sendResponse(['error' => 'Invalid calculator data'], 400);
+            }
 
             $stmt = $pdo->prepare("SELECT * FROM calculators WHERE id = ?");
             $stmt->execute([$id]);
@@ -232,13 +243,23 @@ switch ($admin_endpoint) {
             $requested_sitemap_index = isset($input['sitemap_index'])
                 ? (!empty($input['sitemap_index']) ? 1 : 0)
                 : (int) ($existing['sitemap_index'] ?? 1);
+            if (array_key_exists('component_key', $input)) {
+                $component_key = $input['component_key'];
+                if (!is_string($component_key) || !preg_match('/^[a-z0-9]+(?:-[a-z0-9]+)*$/', trim($component_key))) {
+                    sendResponse(['error' => 'A valid calculator type is required'], 400);
+                }
+                $component_key = trim($component_key);
+            } else {
+                $component_key = (string) ($existing['component_key'] ?: $existing['slug']);
+            }
             $sitemap_ever_indexed = ((int) ($existing['sitemap_ever_indexed'] ?? 0) === 1 || $requested_sitemap_index === 1) ? 1 : 0;
-            $sql = "UPDATE calculators SET category_id=?, name=?, slug=?, icon=?, description=?, language=?, heading=?, meta_title=?, meta_description=?, no_index=?, mathjax=?, sitemap_index=?, sitemap_ever_indexed=?, is_featured=?, is_active=? WHERE id=?";
+            $sql = "UPDATE calculators SET category_id=?, name=?, slug=?, component_key=?, icon=?, description=?, language=?, heading=?, meta_title=?, meta_description=?, no_index=?, mathjax=?, sitemap_index=?, sitemap_ever_indexed=?, is_featured=?, is_active=? WHERE id=?";
             $stmt = $pdo->prepare($sql);
             $stmt->execute([
                 $input['category_id'] ?? $existing['category_id'],
                 $input['name'] ?? $existing['name'],
                 $input['slug'] ?? $existing['slug'],
+                $component_key,
                 $input['icon'] ?? $existing['icon'],
                 $input['description'] ?? $existing['description'],
                 $input['language'] ?? $existing['language'],

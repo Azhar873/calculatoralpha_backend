@@ -35,7 +35,7 @@ $stmt = $pdo->prepare("SELECT c.*, cat.slug as category, c.is_featured as featur
         
         if ($includeCalculators) {
             foreach ($categories as &$category) {
-                $stmt = $pdo->prepare("SELECT c.id, c.name, c.slug, c.icon, c.description, c.meta, c.language, c.heading, c.meta_title, c.meta_description, c.no_index, c.mathjax, c.is_active, c.sort_order, c.is_featured, c.seo_points, c.created_at, c.updated_at, cat.slug as category_slug, CONCAT('/', c.slug) as path FROM calculators c JOIN categories cat ON c.category_id = cat.id WHERE c.category_id = ? AND c.is_active = 1 ORDER BY c.sort_order ASC");
+                $stmt = $pdo->prepare("SELECT c.id, c.name, c.slug, c.component_key, c.icon, c.description, c.meta, c.language, c.heading, c.meta_title, c.meta_description, c.no_index, c.mathjax, c.is_active, c.sort_order, c.is_featured, c.seo_points, c.created_at, c.updated_at, cat.slug as category_slug, CONCAT('/', c.slug) as path FROM calculators c JOIN categories cat ON c.category_id = cat.id WHERE c.category_id = ? AND c.is_active = 1 ORDER BY c.sort_order ASC");
                 $stmt->execute([$category['id']]);
                 
                 $calculators = $stmt->fetchAll(PDO::FETCH_ASSOC);
