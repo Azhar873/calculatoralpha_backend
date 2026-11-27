@@ -216,6 +216,11 @@ switch ($admin_endpoint) {
                 sendResponse(['error' => 'A valid calculator type is required'], 400);
             }
             $component_key = trim($component_key);
+            $typeStmt = $pdo->prepare("SELECT id FROM calculators WHERE component_key = ? OR ((component_key IS NULL OR component_key = '') AND slug = ?) LIMIT 1");
+            $typeStmt->execute([$component_key, $component_key]);
+            if ($typeStmt->fetch()) {
+                sendResponse(['error' => 'This calculator type is already assigned'], 409);
+            }
             $sitemap_index = !empty($input['sitemap_index']) ? 1 : 0;
             $sql = "INSERT INTO calculators (category_id, name, slug, component_key, icon, description, language, heading, meta_title, meta_description, no_index, mathjax, sitemap_index, sitemap_ever_indexed, is_featured, is_active) 
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -249,8 +254,16 @@ switch ($admin_endpoint) {
                     sendResponse(['error' => 'A valid calculator type is required'], 400);
                 }
                 $component_key = trim($component_key);
+                $existing_component_key = $existing['component_key'] ?: $existing['slug'];
+                if ($component_key !== $existing_component_key) {
+                    $typeStmt = $pdo->prepare("SELECT id FROM calculators WHERE id <> ? AND (component_key = ? OR ((component_key IS NULL OR component_key = '') AND slug = ?)) LIMIT 1");
+                    $typeStmt->execute([$id, $component_key, $component_key]);
+                    if ($typeStmt->fetch()) {
+                        sendResponse(['error' => 'This calculator type is already assigned'], 409);
+                    }
+                }
             } else {
-                $component_key = (string) ($existing['component_key'] ?: $existing['slug']);
+                $component_key = $existing['component_key'];
             }
             $sitemap_ever_indexed = ((int) ($existing['sitemap_ever_indexed'] ?? 0) === 1 || $requested_sitemap_index === 1) ? 1 : 0;
             $sql = "UPDATE calculators SET category_id=?, name=?, slug=?, component_key=?, icon=?, description=?, language=?, heading=?, meta_title=?, meta_description=?, no_index=?, mathjax=?, sitemap_index=?, sitemap_ever_indexed=?, is_featured=?, is_active=? WHERE id=?";
